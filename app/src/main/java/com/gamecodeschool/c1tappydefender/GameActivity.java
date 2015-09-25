@@ -22,8 +22,6 @@ public class GameActivity extends AppCompatActivity {
 
         gameView = new TDView(this, size.x, size.y);
         setContentView(gameView);
-
-
     }
 
     @Override

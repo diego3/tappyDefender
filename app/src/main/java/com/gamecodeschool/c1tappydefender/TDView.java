@@ -113,6 +113,9 @@ public class TDView extends SurfaceView implements Runnable {
         if(ourHolder.getSurface().isValid()) {
             canvas = ourHolder.lockCanvas();
 
+            //Rub out the last frame
+            canvas.drawColor(Color.argb(255, 0,0,0));
+
             // Collision detection on new positions
             // Before move because we are testing last frames
             // position which has just been drawn
@@ -126,16 +129,15 @@ public class TDView extends SurfaceView implements Runnable {
                 enemy3.setX(-150);
             }
 
-            canvas.drawColor(Color.argb(255,255,255,255));
+            //change the color to show the stars
+            paint.setColor(Color.argb(255, 255, 255, 255));
             for(SpaceDust sd : dustList){
                 canvas.drawPoint(sd.getX(), sd.getY(), paint);
             }
 
-            //Rub out the last frame
-            canvas.drawColor(Color.argb(255, 0,0,0));
 
+            //show all game players
             canvas.drawBitmap(player.getBitmap(), player.getSpeed(), player.getY(), paint);
-
             canvas.drawBitmap(enemy1.getBitmap(), enemy1.getX(), enemy1.getY(), paint);
             canvas.drawBitmap(enemy2.getBitmap(), enemy2.getX(), enemy2.getY(), paint);
             canvas.drawBitmap(enemy3.getBitmap(), enemy3.getX(), enemy3.getY(), paint);

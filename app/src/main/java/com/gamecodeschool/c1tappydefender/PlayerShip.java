@@ -19,7 +19,7 @@ public class PlayerShip {
     private int minY;
     //limits the bounds of the ship's speed
     private final int MIN_SPEED = 1;
-    private final int MAX_SPEED = 20;
+    private final int MAX_SPEED = 12;
 
     private Rect hitBox;
 
@@ -34,7 +34,7 @@ public class PlayerShip {
         this.maxY = screenY - bitmap.getHeight();
 
         hitBox = new Rect(x,y,bitmap.getWidth(), bitmap.getHeight());
-
+        scaleBitmap(screenX);
     }
 
     public void update(){
@@ -72,6 +72,15 @@ public class PlayerShip {
         hitBox.top    = y;
         hitBox.right  = x + bitmap.getWidth();
         hitBox.bottom = y + bitmap.getHeight();
+    }
+
+    public void scaleBitmap(int screenX) {
+        if(screenX < 1000 ){
+            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 3,  bitmap.getHeight() /3, false);
+        }
+        else if(screenX < 1200) {
+            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 2,  bitmap.getHeight() /2, false);
+        }
     }
 
     public Rect getHitBox(){

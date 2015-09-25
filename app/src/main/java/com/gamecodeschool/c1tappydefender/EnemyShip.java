@@ -23,7 +23,20 @@ public class EnemyShip {
     private Rect hitBox;
 
     public EnemyShip(Context context, int screenX, int screenY){
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy);
+        Random generator = new Random();
+        int which = generator.nextInt(3);
+        switch (which) {
+            case 0:
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy);
+                break;
+            case 1:
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy2);
+                break;
+            case 2:
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy3);
+                break;
+        }
+
 
         maxX = screenX;
         maxY = screenY;
@@ -31,19 +44,20 @@ public class EnemyShip {
         minX = 0;
         minY = 0;
 
-        Random generator = new Random();
-        speed = generator.nextInt(6) + 10;
+        speed = generator.nextInt(6) + 7;
 
         x = screenX;
         y = generator.nextInt(maxY) - bitmap.getHeight();
 
-        hitBox = new Rect(x,y,bitmap.getWidth(), bitmap.getHeight());
+        hitBox = new Rect(x, y, bitmap.getWidth(), bitmap.getHeight());
+
+        scaleBitmap(screenX);
     }
 
 
     public void update(int playerSpeed){
         //move to the left
-        x -= playerSpeed;
+        x -= (playerSpeed / 3);
         x -= speed;
 
         //respawn when off screen
@@ -59,6 +73,16 @@ public class EnemyShip {
         hitBox.top    = y;
         hitBox.right  = x + bitmap.getWidth();
         hitBox.bottom = y + bitmap.getHeight();
+    }
+
+
+    public void scaleBitmap(int screenX) {
+        if(screenX < 1000 ){
+            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 3,  bitmap.getHeight() /3, false);
+        }
+        else if(screenX < 1200) {
+            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 2,  bitmap.getHeight() /2, false);
+        }
     }
 
     public Rect getHitBox() {

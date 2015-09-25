@@ -26,8 +26,6 @@ public class SpaceDust {
         //set the starting coordinates
         x = generator.nextInt(maxX);
         y = generator.nextInt(maxY);
-
-
     }
 
 
