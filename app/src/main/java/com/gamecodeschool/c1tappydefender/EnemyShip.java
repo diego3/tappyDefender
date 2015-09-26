@@ -55,7 +55,7 @@ public class EnemyShip {
     }
 
 
-    public void update(int playerSpeed){
+    public void update(int playerSpeed) {
         //move to the left
         x -= (playerSpeed / 3);
         x -= speed;

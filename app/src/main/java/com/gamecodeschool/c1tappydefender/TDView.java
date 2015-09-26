@@ -35,17 +35,29 @@ public class TDView extends SurfaceView implements Runnable {
 
     public ArrayList<SpaceDust> dustList = new ArrayList<SpaceDust>();
 
+    protected int screenX;
+    protected int screenY;
+
+    private float distanceRemaining;
+    private long timeTaken;
+    private long timeStarted;
+    private long fastestTime;
+
+
     /**
      * The Context parameter that is passed into our constructor is a reference to the
      * current state of our application within the Android system that is held by our
      * GameActivity class.
      *
      * @param context
-     * @param x
-     * @param y
+     * @param x     The max with   screen resolution
+     * @param y     The max height screen resolution
      */
     public TDView(Context context, int x, int y) {
         super(context);
+
+        screenX = x;
+        screenY = y;
 
         ourHolder = getHolder();
         paint = new Paint();
@@ -141,6 +153,16 @@ public class TDView extends SurfaceView implements Runnable {
             canvas.drawBitmap(enemy1.getBitmap(), enemy1.getX(), enemy1.getY(), paint);
             canvas.drawBitmap(enemy2.getBitmap(), enemy2.getX(), enemy2.getY(), paint);
             canvas.drawBitmap(enemy3.getBitmap(), enemy3.getX(), enemy3.getY(), paint);
+
+            //Draw the HUD
+            paint.setTextAlign(Paint.Align.LEFT);
+            paint.setColor(Color.argb(255,255,255,255));
+            paint.setTextSize(25);
+            canvas.drawText("Fastest:" + fastestTime + "s", 10, 20, paint);
+            canvas.drawText("TimeTaken:" + timeTaken + "s", screenX / 2, 20, paint);
+            canvas.drawText("Distance:" + (distanceRemaining / 1000) + "Km", screenX / 3, screenY - 20, paint);
+            canvas.drawText("Shield:" + player.getShieldStrength(), 10, screenY - 20, paint);
+            canvas.drawText("Speed:" + player.getSpeed() * 60 + "MPS", (screenX / 3) * 2, screenY - 20, paint);
 
             ourHolder.unlockCanvasAndPost(canvas);
         }

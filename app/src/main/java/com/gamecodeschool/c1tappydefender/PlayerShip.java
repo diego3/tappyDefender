@@ -23,8 +23,12 @@ public class PlayerShip {
 
     private Rect hitBox;
 
+    private int shieldStrength;
+
+
     public PlayerShip(Context context, int screenX, int screenY) {
-        Log.d(PlayerShip.class.toString(), "PlayerShip was constructed");
+        shieldStrength = 2;
+
         x = 50;
         y = 50;
         speed = 1;
@@ -135,5 +139,13 @@ public class PlayerShip {
 
     public void setSpeed(int speed) {
         this.speed = speed;
+    }
+
+    public void setShieldStrength(int shield){
+        this.shieldStrength = shield;
+    }
+
+    public int getShieldStrength() {
+        return shieldStrength;
     }
 }

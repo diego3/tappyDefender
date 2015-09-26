@@ -21,6 +21,7 @@
         <activity
             android:name=".GameActivity"
             android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
             android:label="@string/title_activity_game" >
         </activity>
     </application>
