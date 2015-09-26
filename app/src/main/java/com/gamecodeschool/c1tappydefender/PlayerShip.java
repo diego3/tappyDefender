@@ -109,6 +109,10 @@ public class PlayerShip {
         this.boosting = false;
     }
 
+    public void reduceShieldStrength() {
+        shieldStrength--;
+    }
+
     public Bitmap getBitmap() {
         return bitmap;
     }

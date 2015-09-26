@@ -39,10 +39,16 @@ public class TDView extends SurfaceView implements Runnable {
     protected int screenY;
 
     private float distanceRemaining;
+    /**
+     * How log has the player been flying
+     */
     private long timeTaken;
     private long timeStarted;
     private long fastestTime;
 
+    private Context context;
+
+    private boolean gameEnded;
 
     /**
      * The Context parameter that is passed into our constructor is a reference to the
@@ -55,6 +61,7 @@ public class TDView extends SurfaceView implements Runnable {
      */
     public TDView(Context context, int x, int y) {
         super(context);
+        this.context = context;
 
         screenX = x;
         screenY = y;
@@ -62,17 +69,29 @@ public class TDView extends SurfaceView implements Runnable {
         ourHolder = getHolder();
         paint = new Paint();
 
-        player = new PlayerShip(context, x, y);
-        enemy1 = new EnemyShip(context, x, y);
-        enemy2 = new EnemyShip(context, x, y);
-        enemy3 = new EnemyShip(context, x, y);
+        startGame();
+    }
+
+    private void startGame() {
+        player = new PlayerShip(context, screenX, screenY);
+        enemy1 = new EnemyShip(context, screenX, screenY);
+        enemy2 = new EnemyShip(context, screenX, screenY);
+        enemy3 = new EnemyShip(context, screenX, screenY);
 
         int numSpecs = 40;
         for (int i=0; i < numSpecs; i++) {
-            SpaceDust spec = new SpaceDust(context, x, y);
+            SpaceDust spec = new SpaceDust(context, screenX, screenY);
             dustList.add( spec );
         }
 
+        //Reset distance and time
+        distanceRemaining = 10000; // 10KM
+        timeTaken = 0;
+
+        //Get start time
+        timeStarted = System.currentTimeMillis();
+
+        gameEnded = false;
     }
 
     @Override
@@ -111,6 +130,49 @@ public class TDView extends SurfaceView implements Runnable {
            dust.update(player.getSpeed());
         }
 
+        // Collision detection on new positions
+        // Before move because we are testing last frames
+        // position which has just been drawn
+        boolean hitDetected = false;
+        if(Rect.intersects(player.getHitBox(), enemy1.getHitBox())){
+            hitDetected = true;
+            enemy1.setX(-150);
+        }
+        if(Rect.intersects(player.getHitBox(), enemy2.getHitBox())){
+            hitDetected = true;
+            enemy2.setX(-150);
+        }
+        if(Rect.intersects(player.getHitBox(), enemy3.getHitBox())){
+            hitDetected = true;
+            enemy3.setX(-150);
+        }
+
+        if(hitDetected) {
+            player.reduceShieldStrength();
+            if(player.getShieldStrength() < 0){
+                //game over or something
+                gameEnded = true;
+            }
+        }
+
+        if(!gameEnded) {
+            //subtract distance to home planet based on the current speed
+            distanceRemaining -= player.getSpeed();
+            //How long has the player been flying
+            timeTaken = System.currentTimeMillis() - timeStarted;
+        }
+
+        if(distanceRemaining < 0){
+            //update the fastestTime
+            if(timeTaken < fastestTime){
+                fastestTime = timeTaken;
+            }
+            //avoid negative numbers
+            distanceRemaining = 0;
+
+            //end of game
+            gameEnded = true;
+        }
     }
 
     private void control() {
@@ -128,25 +190,11 @@ public class TDView extends SurfaceView implements Runnable {
             //Rub out the last frame
             canvas.drawColor(Color.argb(255, 0,0,0));
 
-            // Collision detection on new positions
-            // Before move because we are testing last frames
-            // position which has just been drawn
-            if(Rect.intersects(player.getHitBox(), enemy1.getHitBox())){
-                enemy1.setX(-150);
-            }
-            if(Rect.intersects(player.getHitBox(), enemy2.getHitBox())){
-                enemy2.setX(-150);
-            }
-            if(Rect.intersects(player.getHitBox(), enemy3.getHitBox())){
-                enemy3.setX(-150);
-            }
-
             //change the color to show the stars
             paint.setColor(Color.argb(255, 255, 255, 255));
             for(SpaceDust sd : dustList){
                 canvas.drawPoint(sd.getX(), sd.getY(), paint);
             }
-
 
             //show all game players
             canvas.drawBitmap(player.getBitmap(), player.getSpeed(), player.getY(), paint);
@@ -154,16 +202,31 @@ public class TDView extends SurfaceView implements Runnable {
             canvas.drawBitmap(enemy2.getBitmap(), enemy2.getX(), enemy2.getY(), paint);
             canvas.drawBitmap(enemy3.getBitmap(), enemy3.getX(), enemy3.getY(), paint);
 
-            //Draw the HUD
-            paint.setTextAlign(Paint.Align.LEFT);
-            paint.setColor(Color.argb(255,255,255,255));
-            paint.setTextSize(25);
-            canvas.drawText("Fastest:" + fastestTime + "s", 10, 20, paint);
-            canvas.drawText("TimeTaken:" + timeTaken + "s", screenX / 2, 20, paint);
-            canvas.drawText("Distance:" + (distanceRemaining / 1000) + "Km", screenX / 3, screenY - 20, paint);
-            canvas.drawText("Shield:" + player.getShieldStrength(), 10, screenY - 20, paint);
-            canvas.drawText("Speed:" + player.getSpeed() * 60 + "MPS", (screenX / 3) * 2, screenY - 20, paint);
+            if(!gameEnded) {
+                //Draw the HUD
+                paint.setTextAlign(Paint.Align.LEFT);
+                paint.setColor(Color.argb(255, 255, 255, 255));
+                paint.setTextSize(25);
+                canvas.drawText("Fastest:" + fastestTime + "s", 10, 20, paint);
+                canvas.drawText("TimeTaken:" + timeTaken + "s", screenX / 2, 20, paint);
+                canvas.drawText("Distance:" + (distanceRemaining / 1000) + "Km", screenX / 3, screenY - 20, paint);
+                canvas.drawText("Shield:" + player.getShieldStrength(), 10, screenY - 20, paint);
+                canvas.drawText("Speed:" + player.getSpeed() * 60 + "MPS", (screenX / 3) * 2, screenY - 20, paint);
+            }
+            else {
+                //this happens when the game is ended
+                paint.setTextSize(80);
+                paint.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText("Game Over", screenX / 2, 100, paint);
 
+                paint.setTextSize(25);
+                canvas.drawText("Fastest Time: "+fastestTime+"s", screenX /2, 160, paint);
+                canvas.drawText("Distance Remaining: "+ distanceRemaining/1000 + "KM", screenX / 2, 200, paint);
+
+                paint.setTextSize(80);
+                canvas.drawText("Tap to REPLAY", screenX / 2, 250, paint);
+                
+            }
             ourHolder.unlockCanvasAndPost(canvas);
         }
     }
