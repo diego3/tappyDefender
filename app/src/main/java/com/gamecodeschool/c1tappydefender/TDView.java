@@ -105,6 +105,9 @@ public class TDView extends SurfaceView implements Runnable {
                 break;
             case MotionEvent.ACTION_DOWN:
                 player.setBoosting();
+                if(gameEnded){
+                    startGame();
+                }
                 break;
         }
         return true;
@@ -225,7 +228,7 @@ public class TDView extends SurfaceView implements Runnable {
 
                 paint.setTextSize(80);
                 canvas.drawText("Tap to REPLAY", screenX / 2, 250, paint);
-                
+
             }
             ourHolder.unlockCanvasAndPost(canvas);
         }
