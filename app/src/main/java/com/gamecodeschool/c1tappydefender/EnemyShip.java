@@ -24,7 +24,7 @@ public class EnemyShip {
 
     public EnemyShip(Context context, int screenX, int screenY){
         Random generator = new Random();
-        int which = generator.nextInt(3);
+        int which = generator.nextInt(2);
         switch (which) {
             case 0:
                 bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy);

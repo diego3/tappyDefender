@@ -41,8 +41,7 @@ public class PlayerShip {
         scaleBitmap(screenX);
     }
 
-    public void update(){
-        //System.out.println("speed = " + speed);
+    public void update() {
         if(boosting){
             speed += 2;
         }
