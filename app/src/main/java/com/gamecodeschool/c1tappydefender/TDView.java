@@ -60,6 +60,7 @@ public class TDView extends SurfaceView implements Runnable {
     private int bump = -1;
     private int destroyed = -1;
     private int win = -1;
+    private int level1 = -1;
 
     /**
      * The Context parameter that is passed into our constructor is a reference to the
@@ -82,6 +83,9 @@ public class TDView extends SurfaceView implements Runnable {
         AssetManager assetManager = context.getAssets();
         AssetFileDescriptor descriptor;
         try {
+            descriptor = assetManager.openFd("level1.ogg");
+            level1 = soundPool.load(descriptor, 0);
+
             descriptor = assetManager.openFd("start.ogg");
             start = soundPool.load(descriptor, 0);
 
@@ -130,6 +134,7 @@ public class TDView extends SurfaceView implements Runnable {
         //we are in the game haha
         gameEnded = false;
         soundPool.play(start, 1,1,0,0,1);
+        soundPool.play(level1, 1,1,0,-1,1);
     }
 
     @Override
