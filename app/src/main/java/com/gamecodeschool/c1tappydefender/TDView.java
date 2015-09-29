@@ -31,9 +31,10 @@ public class TDView extends SurfaceView implements Runnable {
 
     //characters to the game
     protected PlayerShip player = null;
-    protected EnemyShip enemy1 = null;
-    protected EnemyShip enemy2 = null;
-    protected EnemyShip enemy3 = null;
+    //protected EnemyShip enemy1 = null;
+    //protected EnemyShip enemy2 = null;
+    //protected EnemyShip enemy3 = null;
+    protected ArrayList<EnemyShip> enemies = new ArrayList<EnemyShip>();
 
     protected Paint paint;
     protected Canvas canvas;
@@ -120,9 +121,14 @@ public class TDView extends SurfaceView implements Runnable {
 
     private void startGame() {
         player = new PlayerShip(context, screenX, screenY);
-        enemy1 = new EnemyShip(context, screenX, screenY);
-        enemy2 = new EnemyShip(context, screenX, screenY);
-        enemy3 = new EnemyShip(context, screenX, screenY);
+        //enemy1 = new EnemyShip(context, screenX, screenY);
+        //enemy2 = new EnemyShip(context, screenX, screenY);
+        //enemy3 = new EnemyShip(context, screenX, screenY);
+        enemies.clear();
+        for(int i=0; i < 4; i++){
+            EnemyShip enemy = new EnemyShip(context, screenX, screenY);
+            enemies.add(enemy);
+        }
 
         //reset the stars amount
         dustList.clear();
@@ -177,9 +183,10 @@ public class TDView extends SurfaceView implements Runnable {
     private void update() {
         //Log.d("resolution", "X = " + screenX + "  Y = " + screenY);//
         player.update();
-        enemy1.update(player.getSpeed());
-        enemy2.update(player.getSpeed());
-        enemy3.update(player.getSpeed());
+
+        for(EnemyShip es : enemies){
+            es.update(player.getSpeed());
+        }
 
         for(SpaceDust dust : dustList){
            dust.update(player.getSpeed());
@@ -189,7 +196,7 @@ public class TDView extends SurfaceView implements Runnable {
         // Before move because we are testing last frames
         // position which has just been drawn
         boolean hitDetected = false;
-        if(Rect.intersects(player.getHitBox(), enemy1.getHitBox())){
+        /*if(Rect.intersects(player.getHitBox(), enemy1.getHitBox())){
             hitDetected = true;
             enemy1.setX(-150);
         }
@@ -200,6 +207,13 @@ public class TDView extends SurfaceView implements Runnable {
         if(Rect.intersects(player.getHitBox(), enemy3.getHitBox())){
             hitDetected = true;
             enemy3.setX(-150);
+        }*/
+
+        for(EnemyShip es : enemies){
+            if(Rect.intersects(player.getHitBox(), es.getHitBox())){
+                hitDetected = true;
+                es.setX(-150);
+            }
         }
 
         if(hitDetected) {
@@ -258,10 +272,12 @@ public class TDView extends SurfaceView implements Runnable {
 
             //show all game players
             canvas.drawBitmap(player.getBitmap(), player.getSpeed(), player.getY(), paint);
-            canvas.drawBitmap(enemy1.getBitmap(), enemy1.getX(), enemy1.getY(), paint);
-            canvas.drawBitmap(enemy2.getBitmap(), enemy2.getX(), enemy2.getY(), paint);
-            canvas.drawBitmap(enemy3.getBitmap(), enemy3.getX(), enemy3.getY(), paint);
-
+            //canvas.drawBitmap(enemy1.getBitmap(), enemy1.getX(), enemy1.getY(), paint);
+            //canvas.drawBitmap(enemy2.getBitmap(), enemy2.getX(), enemy2.getY(), paint);
+            //canvas.drawBitmap(enemy3.getBitmap(), enemy3.getX(), enemy3.getY(), paint);
+            for(EnemyShip es : enemies) {
+                canvas.drawBitmap(es.getBitmap(), es.getX(), es.getY(), paint);
+            }
 
             /**
              * LU       X = 800  Y = 480
