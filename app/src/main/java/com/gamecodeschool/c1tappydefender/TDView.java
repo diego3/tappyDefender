@@ -2,6 +2,7 @@ package com.gamecodeschool.c1tappydefender;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
@@ -62,6 +63,9 @@ public class TDView extends SurfaceView implements Runnable {
     private int win = -1;
     private int level1 = -1;
 
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor editor;
+
     /**
      * The Context parameter that is passed into our constructor is a reference to the
      * current state of our application within the Android system that is held by our
@@ -74,6 +78,10 @@ public class TDView extends SurfaceView implements Runnable {
     public TDView(Context context, int x, int y) {
         super(context);
         this.context = context;
+
+        prefs = context.getSharedPreferences("highScore", context.MODE_PRIVATE);
+        editor = prefs.edit();
+        fastestTime = prefs.getLong("fastestLong", 1);
 
         //API 21
         //SoundPool.Builder builder = new SoundPool.Builder();
@@ -133,8 +141,8 @@ public class TDView extends SurfaceView implements Runnable {
 
         //we are in the game haha
         gameEnded = false;
-        soundPool.play(start, 1,1,0,0,1);
-        soundPool.play(level1, 1,1,0,-1,1);
+        //soundPool.play(start, 1,1,0,0,1);
+        //soundPool.play(level1, 1,1,0,-1,1);
     }
 
     @Override
@@ -167,7 +175,7 @@ public class TDView extends SurfaceView implements Runnable {
     }
 
     private void update() {
-        //Log.d("resolution", "X = " + screenX + "  Y = " + screenY);// X = 320  Y = 240
+        //Log.d("resolution", "X = " + screenX + "  Y = " + screenY);//
         player.update();
         enemy1.update(player.getSpeed());
         enemy2.update(player.getSpeed());
@@ -196,10 +204,10 @@ public class TDView extends SurfaceView implements Runnable {
 
         if(hitDetected) {
             player.reduceShieldStrength();
-            soundPool.play(bump, 1,1,0,0,1);
+            //soundPool.play(bump, 1,1,0,0,1);
             if(player.getShieldStrength() < 0){
                 //game over
-                soundPool.play(destroyed, 1,1,0,0,1);
+                //soundPool.play(destroyed, 1,1,0,0,1);
                 gameEnded = true;
             }
         }
@@ -211,15 +219,17 @@ public class TDView extends SurfaceView implements Runnable {
             timeTaken = System.currentTimeMillis() - timeStarted;
         }
 
+        //update the fastestTime
+        if(gameEnded && timeTaken > fastestTime) {
+            editor.putLong("fastestTime", fastestTime);
+            editor.commit();
+            fastestTime = timeTaken;
+        }
+
         if(distanceRemaining < 0) {
-            soundPool.play(win, 1,1,0,0,1);
-            //update the fastestTime
-            if(timeTaken < fastestTime){
-                fastestTime = timeTaken;
-            }
+            //soundPool.play(win, 1,1,0,0,1);
             //avoid negative numbers
             distanceRemaining = 0;
-
             //end of game
             gameEnded = true;
         }
@@ -253,17 +263,20 @@ public class TDView extends SurfaceView implements Runnable {
             canvas.drawBitmap(enemy3.getBitmap(), enemy3.getX(), enemy3.getY(), paint);
 
 
-
+            /**
+             * LU       X = 800  Y = 480
+             * THIAGO   X = 320  Y = 240
+             */
             if(!gameEnded) {
                 //Draw the HUD
                 paint.setTextAlign(Paint.Align.LEFT);
                 paint.setColor(Color.argb(255, 255, 255, 255));
-                paint.setTextSize(10);//25
+                paint.setTextSize(25);//25
                 canvas.drawText("Fastest:" + fastestTime + "s", 10, 20, paint);
                 canvas.drawText("TimeTaken:" + timeTaken + "s", screenX / 2, 20, paint);
-                canvas.drawText("Distance:" + (distanceRemaining / 1000) + "Km", screenX / 3, screenY - 20, paint);
-                canvas.drawText("Shield:" + player.getShieldStrength(), 10, screenY - 20, paint);
-                canvas.drawText("Speed:" + player.getSpeed() * 60 + "MPS", (screenX / 3) * 2, screenY - 20, paint);
+                canvas.drawText("Distance:" + (distanceRemaining / 1000) + "Km", screenX / 3, screenY - 40, paint);
+                canvas.drawText("Shield:" + player.getShieldStrength(), 10, screenY - 40, paint);
+                canvas.drawText("Speed:" + player.getSpeed() * 60 + "MPS", (screenX / 3) * 2, screenY - 40, paint);
             }
             else {
                 //this happens when the game is ended
@@ -271,7 +284,7 @@ public class TDView extends SurfaceView implements Runnable {
                 paint.setTextAlign(Paint.Align.CENTER);
                 canvas.drawText("Game Over", screenX / 2, 100, paint);
 
-                paint.setTextSize(15);
+                paint.setTextSize(25);
                 canvas.drawText("Fastest Time: " + fastestTime + "s", screenX /2, 160, paint);
                 canvas.drawText("Distance Remaining: " + distanceRemaining / 1000 + "KM", screenX / 2, 200, paint);
 

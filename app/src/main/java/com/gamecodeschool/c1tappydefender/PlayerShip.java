@@ -13,7 +13,7 @@ public class PlayerShip {
     protected int speed;
     protected boolean boosting;
 
-    private final int GRAVITY = -8;
+    private final int GRAVITY = -9;
     //Stop ship leaving the screen
     private int maxY;
     private int minY;
@@ -43,7 +43,7 @@ public class PlayerShip {
 
     public void update() {
         if(boosting){
-            speed += 2;
+            speed += 4;
         }
         else {
             speed -= 5;
@@ -78,7 +78,10 @@ public class PlayerShip {
     }
 
     public void scaleBitmap(int screenX) {
-        if(screenX < 1000 ){
+        if(screenX < 900) {
+
+        }
+        else if(screenX < 1000 ){
             bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 3,  bitmap.getHeight() /3, false);
         }
         else if(screenX < 1200) {

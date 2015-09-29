@@ -24,7 +24,7 @@ public class EnemyShip {
 
     public EnemyShip(Context context, int screenX, int screenY){
         Random generator = new Random();
-        int which = generator.nextInt(2);
+        int which = generator.nextInt(3);
         switch (which) {
             case 0:
                 bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy);
@@ -57,14 +57,13 @@ public class EnemyShip {
 
     public void update(int playerSpeed) {
         //move to the left
-        x -= (playerSpeed / 3);
+        //x -= (playerSpeed / 8);// it was 3 on begin
         x -= speed;
 
         //respawn when off screen
         if(x < minX - bitmap.getWidth()){
             Random generator = new Random();
             speed = generator.nextInt(10) + 10;
-
             x = maxX;
             y = generator.nextInt(maxY) - bitmap.getHeight();
         }
